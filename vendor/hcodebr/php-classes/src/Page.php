@@ -14,11 +14,12 @@ class Page
     ];
     private $folder = "/projeto-ecommerce/";
 
-    public function __construct($opts = array())
+    public function __construct($opts = array(),$tpl_dir="/views/")
     {
+        
         $this->options = array_merge($this->defaults, $opts);
         $config = array(
-            "tpl_dir" => $_SERVER["DOCUMENT_ROOT"] . $this->folder. "/views/",
+            "tpl_dir" => $_SERVER["DOCUMENT_ROOT"] . $this->folder. $tpl_dir,
             "cache_dir" => $_SERVER["DOCUMENT_ROOT"] . $this->folder. "/views-cache/",
             "debug" => false,
         );
