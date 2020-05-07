@@ -47,4 +47,60 @@ $app->get('/admin/logout',function(){
 	exit;
 });
 
+//User-lista
+$app->get("/admin/users",function(){
+
+    User::verifyLogin();
+
+    $users = User::listAll();
+
+    $page = new PageAdmin();
+
+    $page->setTpl("users",array(
+        "users"=>$users
+    ));
+
+}); 
+
+//User-create-formulário
+$app->get("/admin/users/create",function(){
+    User::verifyLogin();
+    $page = new PageAdmin();
+    $page->setTpl("users-create");
+
+});
+
+//User-delete
+$app->get("/admin/users/:iduser/delete",function($iduser){
+    User::verifyLogin();
+});
+
+//User-update-carregamento
+$app->get("/admin/users/:iduser",function($iduser){
+    User::verifyLogin();
+    $page = new PageAdmin();
+    $page->setTpl("users-update");
+
+});
+
+//User-create-insere
+$app->post("/admin/users/create",function(){
+
+    User::verifyLogin();
+
+    $user = new User();
+
+    $user->setData($_POST);
+
+    var_dump($user);
+
+});
+
+//User-update-atualiza
+$app->post("/admin/users/:iduser",function($iduser){
+    User::verifyLogin();
+
+});
+
+
 $app->run();
