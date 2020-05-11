@@ -30,7 +30,7 @@ class Mailer{
           $tpl->assign($key, $value);
       }
       
-      $html = $tpl->draw($tplName,true);
+      $html = $tpl->draw($tplName,true);//TRUE joga para dentro da variação, não imprime na tela.
 
       //-------------------------//
      
