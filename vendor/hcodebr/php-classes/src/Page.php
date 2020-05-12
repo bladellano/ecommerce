@@ -17,7 +17,6 @@ class Page
 
     public function __construct($opts = array(),$tpl_dir="/views/")
     {
-        
         $this->options = array_merge($this->defaults, $opts);
         $config = array(
             "tpl_dir" => $_SERVER["DOCUMENT_ROOT"] . $tpl_dir,
@@ -27,6 +26,7 @@ class Page
 
         Tpl::configure($config);
         $this->tpl = new Tpl;
+        
         $this->setData($this->options["data"]);       
          if($this->options["header"]===true) $this->tpl->draw("header");
 
