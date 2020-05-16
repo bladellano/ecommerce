@@ -20,7 +20,7 @@ class Products extends Model
     public static function checkList($list)
     {
 
-        foreach($list as &$row){
+        foreach ($list as &$row) {
             $p = new Products();
             $p->setData($row);
             $row = $p->getValues();
@@ -97,7 +97,6 @@ class Products extends Model
 
     public function setPhoto($file)
     {
-
         $extension = explode('.', $file["name"]);
         $extension = end($extension);
 
@@ -118,15 +117,35 @@ class Products extends Model
         }
 
         imagejpeg($image, $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR .
-        'res' . DIRECTORY_SEPARATOR .
-        'site' . DIRECTORY_SEPARATOR .
-        'img' . DIRECTORY_SEPARATOR .
-        'products' . DIRECTORY_SEPARATOR .
-        $this->getidproduct() . '.jpg');
+            'res' . DIRECTORY_SEPARATOR .
+            'site' . DIRECTORY_SEPARATOR .
+            'img' . DIRECTORY_SEPARATOR .
+            'products' . DIRECTORY_SEPARATOR .
+            $this->getidproduct() . '.jpg');
 
         imagedestroy($image);
 
         $this->checkPhoto();
 
+    }
+
+    public function getFromUrl($desurl)
+    {
+        $sql = new Sql();
+
+        $rows = $sql->select("SELECT * FROM tb_products WHERE desurl = :desurl LIMIT 1", [
+            ':desurl' => $desurl,
+        ]);
+
+        $this->setData($rows[0]);
+    }
+
+    public function getCategories()
+    {
+        $sql = new Sql();
+        return $sql->select("SELECT * FROM tb_categories a INNER JOIN tb_productscategories b ON a.idcategory = b.idcategory 
+        WHERE b.idproduct = :idproduct",[
+            ':idproduct'=> $this->getidproduct()
+        ]);
     }
 }
