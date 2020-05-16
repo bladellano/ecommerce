@@ -93,22 +93,47 @@ class Category extends Model
 
     public function addProduct(Products $product)
     {
-         $sql = new Sql();
+        $sql = new Sql();
 
-         $sql->query("INSERT INTO tb_productscategories (idcategory,idproduct) VALUES (:idcategory, :idproduct)",[
-             ":idcategory" => $this->getidcategory(),
-             ":idproduct" => $product->getidproduct()
-         ]);
+        $sql->query("INSERT INTO tb_productscategories (idcategory,idproduct) VALUES (:idcategory, :idproduct)", [
+            ":idcategory" => $this->getidcategory(),
+            ":idproduct" => $product->getidproduct(),
+        ]);
     }
-
 
     public function removeProduct(Products $product)
     {
-         $sql = new Sql();
-         $sql->query("DELETE FROM tb_productscategories WHERE idcategory = :idcategory AND idproduct = :idproduct",[
-             ":idcategory" => $this->getidcategory(),
-             ":idproduct" => $product->getidproduct()
-         ]);
+        $sql = new Sql();
+        $sql->query("DELETE FROM tb_productscategories WHERE idcategory = :idcategory AND idproduct = :idproduct", [
+            ":idcategory" => $this->getidcategory(),
+            ":idproduct" => $product->getidproduct(),
+        ]);
+    }
+
+    public function getProductsPage($page = 1, $itensPerPage = 3)
+    {
+
+        $start = ($page - 1) * $itensPerPage;
+
+        $sql = new Sql();
+
+        $results = $sql->select("SELECT SQL_CALC_FOUND_ROWS *
+            FROM tb_products a
+            INNER JOIN tb_productscategories b ON a.idproduct = b.idproduct
+            INNER JOIN tb_categories c ON c.idcategory = b.idcategory
+            WHERE c.idcategory = :idcategory
+            LIMIT $start, $itensPerPage;", array(
+            ':idcategory' => $this->getidcategory(),
+        ));
+
+        $resultTotal = $sql->select("SELECT FOUND_ROWS() AS nrtotal;");
+
+        return [
+            'data' => Products::checkList($results),
+            'total' => $resultTotal[0]['nrtotal'],
+            'pages' => ceil($resultTotal[0]['nrtotal'] / $itensPerPage),
+        ];
+
     }
 
 }
