@@ -1,113 +1,147 @@
-<?php
+  <?php
 
-use Hcode\Model\Cart;
-use Hcode\Model\Category;
-use Hcode\Model\Products;
-use Hcode\Page;
+    use Hcode\Model\Cart;
+    use Hcode\Model\Category;
+    use Hcode\Model\Products;
+    use Hcode\Page;
+    use Hcode\Model\Address;
+    use Hcode\Model\User;
 
-$app->get('/', function () {
-    $products = Products::listAll();
-    $page = new Page();
-    $page->setTpl("index", [
-        'products' => Products::checkList($products)]);
-});
-
-$app->get("/categories/:idcategory", function ($idcategory) {
-    $page = (isset($_GET['page'])) ? (int) $_GET['page'] : 1;
-    $category = new Category();
-    $category->get((int) $idcategory);
-    $pagination = $category->getProductsPage($page);
-    $pages = [];
-    for ($i = 1; $i <= $pagination['pages']; $i++) {
-        array_push($pages, [
-            'link' => '/categories/' . $category->getidcategory() . '?page=' . $i,
-            'page' => $i,
+    $app->get('/', function () {
+        $products = Products::listAll();
+        $page = new Page();
+        $page->setTpl("index", [
+            'products' => Products::checkList($products)
         ]);
-    }
-    $page = new Page();
-    $page->setTpl("category", [
-        'category' => $category->getValues(),
-        'products' => $pagination['data'],
-        'pages' => $pages,
-    ]);
-});
+    });
 
-$app->get("/products/:desurl", function ($desurl) {
-    $product = new Products();
-    $product->getFromUrl($desurl);
-    $page = new Page();
+    $app->get("/categories/:idcategory", function ($idcategory) {
+        $page = (isset($_GET['page'])) ? (int) $_GET['page'] : 1;
+        $category = new Category();
+        $category->get((int) $idcategory);
+        $pagination = $category->getProductsPage($page);
+        $pages = [];
+        for ($i = 1; $i <= $pagination['pages']; $i++) {
+            array_push($pages, [
+                'link' => '/categories/' . $category->getidcategory() . '?page=' . $i,
+                'page' => $i,
+            ]);
+        }
+        $page = new Page();
+        $page->setTpl("category", [
+            'category' => $category->getValues(),
+            'products' => $pagination['data'],
+            'pages' => $pages,
+        ]);
+    });
 
-    $page->setTpl("product-detail", [
-        'product' => $product->getValues(),
-        'categories' => $product->getCategories(),
-    ]);
+    $app->get("/products/:desurl", function ($desurl) {
+        $product = new Products();
+        $product->getFromUrl($desurl);
+        $page = new Page();
 
-});
+        $page->setTpl("product-detail", [
+            'product' => $product->getValues(),
+            'categories' => $product->getCategories(),
+        ]);
+    });
 
-$app->get("/cart", function () {
-    
-    $cart = Cart::getFromSession();
+    $app->get("/cart", function () {
 
-    $page = new Page();
+        $cart = Cart::getFromSession();
 
-    // echo '<pre>'; var_dump($cart->getValues());exit;
+        $page = new Page();
 
-    $page->setTpl("cart",[
-        'cart'=>$cart->getValues(),
-        'products'=>$cart->getProducts(),
-        'error'=>Cart::getMsgError()
-    ]);
-});
+        // echo '<pre>'; var_dump($cart->getValues());exit;
 
-$app->get("/cart/:idproduct/add",function($idproduct){
+        $page->setTpl("cart", [
+            'cart' => $cart->getValues(),
+            'products' => $cart->getProducts(),
+            'error' => Cart::getMsgError()
+        ]);
+    });
 
-    $product = new Products();
+    $app->get("/cart/:idproduct/add", function ($idproduct) {
 
-    $product->get((int) $idproduct);
+        $product = new Products();
 
-    $cart = Cart::getFromSession();
+        $product->get((int) $idproduct);
 
-    $qtd = (isset($_GET['qtd'])) ? (int)$_GET['qtd'] : 1 ;
+        $cart = Cart::getFromSession();
 
-    for ($i=0; $i < $qtd ; $i++) { 
-        $cart->addProduct($product);
-    }
-    header("Location:/cart");
-    exit;
-});
+        $qtd = (isset($_GET['qtd'])) ? (int) $_GET['qtd'] : 1;
 
-$app->get("/cart/:idproduct/minus",function($idproduct){
+        for ($i = 0; $i < $qtd; $i++) {
+            $cart->addProduct($product);
+        }
+        header("Location:/cart");
+        exit;
+    });
 
-    $product = new Products();
+    $app->get("/cart/:idproduct/minus", function ($idproduct) {
 
-    $product->get((int) $idproduct);
+        $product = new Products();
 
-    $cart = Cart::getFromSession();
+        $product->get((int) $idproduct);
 
-    $cart->removeProduct($product);
+        $cart = Cart::getFromSession();
 
-    header("Location:/cart");
-    exit;
-});
+        $cart->removeProduct($product);
 
-$app->get("/cart/:idproduct/remove",function($idproduct){
+        header("Location:/cart");
+        exit;
+    });
 
-    $product = new Products();
+    $app->get("/cart/:idproduct/remove", function ($idproduct) {
 
-    $product->get((int) $idproduct);
+        $product = new Products();
+        $product->get((int) $idproduct);
+        $cart = Cart::getFromSession();
+        $cart->removeProduct($product, true);//true - remove todos
+        header("Location:/cart");
+        exit;
+    });
 
-    $cart = Cart::getFromSession();
+    $app->post("/cart/freight", function () {
+        $cart = Cart::getFromSession();
+        $cart->setFreight($_POST['zipcode']);
+        header("Location: /cart");
+        exit;
+    });
 
-    $cart->removeProduct($product,true);//true - remove todos
+    $app->get('/checkout', function () {
 
-    header("Location:/cart");
-    exit;
-});
+        User::verifyLogin(false);
 
-$app->post("/cart/freight",function(){
-    $cart = Cart::getFromSession();
-    $cart->setFreight($_POST['zipcode']);
-    header("Location: /cart");
-    exit;
-});
+        $cart = Cart::getFromSession();
 
+        $address = new Address();
+
+        $page = new Page();
+
+        $page->setTpl('checkout', [
+            'cart' => $cart->getValues(),
+            'address' => $address->getValues()
+        ]);
+    });
+
+    $app->get('/login', function () {
+
+        $page = new Page();
+
+        $page->setTpl('login', [
+            'error' => User::getError()
+        ]);
+    });
+
+
+    $app->post('/login', function () {
+
+        try {
+            User::login($_POST['login'], $_POST['password']);
+        } catch (\Exception $e) {
+            User::setError($e->getMessage());
+        }
+        header("Location: /checkout");
+        exit;
+    });
