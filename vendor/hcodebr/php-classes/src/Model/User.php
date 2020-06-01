@@ -27,42 +27,40 @@ class User extends Model
         }
 
         return $user;
-
     }
 
     public static function checkLogin($inadmin = true)
-	{
+    {
 
-		if (
-			!isset($_SESSION[User::SESSION])
-			||
-			!$_SESSION[User::SESSION]
-			||
-			!(int)$_SESSION[User::SESSION]["iduser"] > 0
-		) {
-			//Não está logado
-			return false;
+        if (
+            !isset($_SESSION[User::SESSION])
+            ||
+            !$_SESSION[User::SESSION]
+            ||
+            !(int) $_SESSION[User::SESSION]["iduser"] > 0
+        ) {
+            //Não está logado
+            return false;
+        } else {
 
-		} else {
-
-			if ($inadmin === true && (bool)$_SESSION[User::SESSION]['inadmin'] === true) {
-				return true;
-			} else if ($inadmin === false) {
-				return true;
-			} else {
-				return false;
-			}
-
-		}
-
-	}
+            if ($inadmin === true && (bool) $_SESSION[User::SESSION]['inadmin'] === true) {
+                return true;
+            } else if ($inadmin === false) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
     public static function login($login, $password)
     {
 
         $sql = new Sql();
-        $results = $sql->select("SELECT * FROM tb_users WHERE deslogin = :LOGIN", array(
-            ":LOGIN" => $login,
+
+        $results = $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b ON a.idperson = b.idperson WHERE a.deslogin = :LOGIN", array(
+            ":LOGIN" => $login
         ));
+
         if (count($results) === 0) {
             throw new \Exception("Usuário inexistente ou senha inválida.");
         }
@@ -70,37 +68,38 @@ class User extends Model
         $data = $results[0];
 
         if (password_verify($password, $data["despassword"]) === true) {
+
             $user = new User();
+
+            $data['desperson'] = utf8_encode($data['desperson']);
+
             $user->setData($data);
 
             $_SESSION[User::SESSION] = $user->getValues();
 
             return $user;
-
         } else {
             throw new \Exception("Usuário inexistente ou senha inválida.");
         }
     }
 
     public static function verifyLogin($inadmin = true)
-   {
+    {
 
-      if(!User::checkLogin($inadmin)){
+        if (!User::checkLogin($inadmin)) {
 
-          if($inadmin){
-           header("Location: /admin/login");
-          } else {
-           header("Location: /login");
-          }
-          exit;
-
-      }
-   }
+            if ($inadmin) {
+                header("Location: /admin/login");
+            } else {
+                header("Location: /login");
+            }
+            exit;
+        }
+    }
 
     public static function logout()
     {
         $_SESSION[User::SESSION] = null;
-
     }
 
     public static function listAll()
@@ -115,15 +114,17 @@ class User extends Model
 
         $sql = new Sql();
 
-        $results = $sql->select("CALL sp_users_save(:desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)",
+        $results = $sql->select(
+            "CALL sp_users_save(:desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)",
             array(
-                ":desperson" => $this->getdesperson(),
+                ":desperson" => utf8_decode($this->getdesperson()),
                 ":deslogin" => $this->getdeslogin(),
-                ":despassword" => $this->getdespassword(),
+                ":despassword" => User::getPasswordHash($this->getdespassword()),
                 ":desemail" => $this->getdesemail(),
                 ":nrphone" => $this->getnrphone(),
                 ":inadmin" => $this->getinadmin(),
-            ));
+            )
+        );
 
         $this->setData($results[0]);
     }
@@ -133,10 +134,12 @@ class User extends Model
 
         $sql = new Sql();
 
-        $results = $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b USING(idperson) WHERE a.iduser = :iduser",
+        $results = $sql->select(
+            "SELECT * FROM tb_users a INNER JOIN tb_persons b USING(idperson) WHERE a.iduser = :iduser",
             array(
                 ":iduser" => $iduser,
-            ));
+            )
+        );
 
         $this->setData($results[0]);
     }
@@ -146,19 +149,20 @@ class User extends Model
 
         $sql = new Sql();
 
-        $results = $sql->select("CALL sp_usersupdate_save(:iduser, :desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)",
+        $results = $sql->select(
+            "CALL sp_usersupdate_save(:iduser, :desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)",
             array(
                 ":iduser" => $this->getiduser(),
-                ":desperson" => $this->getdesperson(),
+                ":desperson" => utf8_decode($this->getdesperson()),
                 ":deslogin" => $this->getdeslogin(),
-                ":despassword" => $this->getdespassword(),
+                ":despassword" => User::getPasswordHash($this->getdespassword()),
                 ":desemail" => $this->getdesemail(),
                 ":nrphone" => $this->getnrphone(),
                 ":inadmin" => $this->getinadmin(),
-            ));
+            )
+        );
 
         $this->setData($results[0]);
-
     }
 
     public function delete()
@@ -187,11 +191,13 @@ class User extends Model
         } else {
             $data = $results[0];
 
-            $retornoDataRecovery = $sql->select("CALL sp_userspasswordsrecoveries_create(:iduser, :desip)",
+            $retornoDataRecovery = $sql->select(
+                "CALL sp_userspasswordsrecoveries_create(:iduser, :desip)",
                 array(
                     ":iduser" => $data["iduser"],
                     ":desip" => $_SERVER["REMOTE_ADDR"],
-                ));
+                )
+            );
 
             if (count($retornoDataRecovery) === 0) {
                 throw new \Exception("Não foi possível recuperar a senha.");
@@ -223,7 +229,8 @@ class User extends Model
         $idrecovery = openssl_decrypt($code, 'AES-128-CBC', pack("a16", User::SECRET), 0, pack("a16", User::SECRET_IV));
         $sql = new Sql();
 
-        $results = $sql->select("SELECT *
+        $results = $sql->select(
+            "SELECT *
             FROM tb_userspasswordsrecoveries a
             INNER JOIN tb_users b USING(iduser)
             INNER JOIN tb_persons c USING(idperson)
@@ -233,14 +240,14 @@ class User extends Model
             a.dtrecovery IS NULL
             AND
             DATE_ADD(a.dtregister,INTERVAL 12 HOUR) >= NOW()",
-            array("idrecovery" => $idrecovery));
+            array("idrecovery" => $idrecovery)
+        );
 
         if (count($results) === 0) {
             throw new \Exception("Não foi possível recuperar a senha.");
         } else {
             return $results[0];
         }
-
     }
 
     public static function setForgotUsed($idrecovery)
@@ -263,78 +270,75 @@ class User extends Model
     }
 
     public static function clearErrorRegister()
-	{
+    {
 
-		$_SESSION[User::ERROR_REGISTER] = NULL;
-
+        $_SESSION[User::ERROR_REGISTER] = NULL;
     }
-    
+
     public static function getErrorRegister()
-	{
+    {
 
-		$msg = (isset($_SESSION[User::ERROR_REGISTER]) && $_SESSION[User::ERROR_REGISTER]) ? $_SESSION[User::ERROR_REGISTER] : '';
+        $msg = (isset($_SESSION[User::ERROR_REGISTER]) && $_SESSION[User::ERROR_REGISTER]) ? $_SESSION[User::ERROR_REGISTER] : '';
 
-		User::clearErrorRegister();
+        User::clearErrorRegister();
 
-		return $msg;
-
+        return $msg;
     }
-    
+
     public static function setErrorRegister($msg)
-	{
+    {
 
-		$_SESSION[User::ERROR_REGISTER] = $msg;
-
+        $_SESSION[User::ERROR_REGISTER] = $msg;
     }
-    
+
     public static function clearSuccess()
-	{
+    {
 
-		$_SESSION[User::SUCCESS] = NULL;
-
+        $_SESSION[User::SUCCESS] = NULL;
     }
-    
+
     public static function getSuccess()
-	{
+    {
 
-		$msg = (isset($_SESSION[User::SUCCESS]) && $_SESSION[User::SUCCESS]) ? $_SESSION[User::SUCCESS] : '';
+        $msg = (isset($_SESSION[User::SUCCESS]) && $_SESSION[User::SUCCESS]) ? $_SESSION[User::SUCCESS] : '';
 
-		User::clearSuccess();
+        User::clearSuccess();
 
-		return $msg;
-
+        return $msg;
     }
-    
+
     public static function setSuccess($msg)
-	{
+    {
 
-		$_SESSION[User::SUCCESS] = $msg;
-
+        $_SESSION[User::SUCCESS] = $msg;
     }
 
     public static function clearError()
-	{
+    {
 
-		$_SESSION[User::ERROR] = NULL;
-
+        $_SESSION[User::ERROR] = NULL;
     }
-    
+
     public static function getError()
-	{
+    {
 
-		$msg = (isset($_SESSION[User::ERROR]) && $_SESSION[User::ERROR]) ? $_SESSION[User::ERROR] : '';
+        $msg = (isset($_SESSION[User::ERROR]) && $_SESSION[User::ERROR]) ? $_SESSION[User::ERROR] : '';
 
-		User::clearError();
+        User::clearError();
 
-		return $msg;
-
+        return $msg;
     }
-    
+
     public static function setError($msg)
-	{
+    {
 
-		$_SESSION[User::ERROR] = $msg;
+        $_SESSION[User::ERROR] = $msg;
+    }
 
-	}
-
+    public static function getPasswordHash($password)
+    {
+        return password_hash($password, PASSWORD_DEFAULT, [
+            'cost' => 12
+        ]);
+    }
 }

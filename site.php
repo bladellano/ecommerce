@@ -97,7 +97,7 @@
         $product = new Products();
         $product->get((int) $idproduct);
         $cart = Cart::getFromSession();
-        $cart->removeProduct($product, true);//true - remove todos
+        $cart->removeProduct($product, true); //true - remove todos
         header("Location:/cart");
         exit;
     });
@@ -143,5 +143,12 @@
             User::setError($e->getMessage());
         }
         header("Location: /checkout");
+        exit;
+    });
+
+
+    $app->get('/logout', function () {
+        User::logout();
+        header('Location:/login');
         exit;
     });
