@@ -304,32 +304,10 @@ class User extends Model
         $_SESSION[User::ERROR_REGISTER] = $msg;
     }
 
-    public static function clearSuccess()
+    public static function setError($msg)
     {
 
-        $_SESSION[User::SUCCESS] = NULL;
-    }
-
-    public static function getSuccess()
-    {
-
-        $msg = (isset($_SESSION[User::SUCCESS]) && $_SESSION[User::SUCCESS]) ? $_SESSION[User::SUCCESS] : '';
-
-        User::clearSuccess();
-
-        return $msg;
-    }
-
-    public static function setSuccess($msg)
-    {
-
-        $_SESSION[User::SUCCESS] = $msg;
-    }
-
-    public static function clearError()
-    {
-
-        $_SESSION[User::ERROR] = NULL;
+        $_SESSION[User::ERROR] = $msg;
     }
 
     public static function getError()
@@ -342,10 +320,31 @@ class User extends Model
         return $msg;
     }
 
-    public static function setError($msg)
+    public static function clearError()
     {
 
-        $_SESSION[User::ERROR] = $msg;
+        $_SESSION[User::ERROR] = NULL;
+    }
+
+    public static function setSuccess($msg)
+    {
+
+        $_SESSION[User::SUCCESS] = $msg;
+    }
+
+    public static function getSuccess()
+    {
+
+        $msg = (isset($_SESSION[User::SUCCESS]) && $_SESSION[User::SUCCESS]) ? $_SESSION[User::SUCCESS] : '';
+
+        User::clearSuccess();
+
+        return $msg;
+    }
+    public static function clearSuccess()
+    {
+
+        $_SESSION[User::SUCCESS] = NULL;
     }
 
     public static function getPasswordHash($password)

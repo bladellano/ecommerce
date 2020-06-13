@@ -152,7 +152,6 @@ class Cart extends Model
         WHERE b.idcart = :idcart AND b.dtremoved IS NULL", [
             ':idcart' => $this->getidcart(),
         ]);
-        // echo '<pre>$results<br />'; var_dump($results[0]['vlprice']); echo '</pre>';exit;
 
         if (count($results) > 0) {
             return $results[0];
@@ -266,7 +265,6 @@ class Cart extends Model
 
         $this->setvlsubtotal($totals['vlprice']);
         $this->setvltotal($totals['vlprice'] + $this->getvlfreight());
-
         
     }
 

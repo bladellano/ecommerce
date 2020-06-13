@@ -145,7 +145,6 @@
     });
 
     $app->post("/checkout", function () {
-
         User::verifyLogin(false);
         if (!isset($_POST['zipcode']) || $_POST['zipcode'] === '') {
             Address::setMsgError("Informe o CEP.");
@@ -199,7 +198,6 @@
         $cart->getCalculateTotal();
 
         $order = new Order();
-
         $order->setData([
             'idcart' => $cart->getidcart(),
             'idaddress' => $address->getidaddress(),
