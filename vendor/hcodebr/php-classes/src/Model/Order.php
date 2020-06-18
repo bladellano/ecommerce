@@ -130,7 +130,7 @@ class Order extends Model
         $_SESSION[Order::SUCCESS] = NULL;
     }
 
-    public static function getPage($page = 1, $itensPerPage = 3)
+    public static function getPage($page = 1, $itensPerPage = 8)
     {
 
         $start = ($page - 1) * $itensPerPage;
@@ -158,7 +158,7 @@ class Order extends Model
         ];
 
     }
-    public static function getPageSearch($search, $page = 1, $itensPerPage = 3)
+    public static function getPageSearch($search, $page = 1, $itensPerPage = 8)
     {
 
         $start = ($page - 1) * $itensPerPage;

@@ -115,6 +115,7 @@ class Products extends Model
 
         }
 
+
         imagejpeg($image, $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR .
             'res' . DIRECTORY_SEPARATOR .
             'site' . DIRECTORY_SEPARATOR .

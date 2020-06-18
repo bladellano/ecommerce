@@ -94,7 +94,8 @@ $app->post("/admin/products/:idproduct",function($idproduct){
 
     $product->save();
 
-    $product->setPhoto($_FILES["file"]);
+    if($_FILES['file']['error'] === 0)
+        $product->setPhoto($_FILES["file"]);
 
     header("Location:/admin/products");
     exit;

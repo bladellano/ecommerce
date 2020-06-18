@@ -152,6 +152,11 @@
             header('Location: /checkout');
             exit;
         }
+        if (!isset($_POST['desnumber']) || $_POST['desnumber'] === '') {
+            Address::setMsgError("Informe o número.");
+            header('Location: /checkout');
+            exit;
+        }
 
         if (!isset($_POST['desaddress']) || $_POST['desaddress'] === '') {
             Address::setMsgError("Informe o endereço.");
@@ -199,41 +204,80 @@
         $cart->getCalculateTotal();
 
         $order = new Order();
+
         $order->setData([
             'idcart' => $cart->getidcart(),
             'idaddress' => $address->getidaddress(),
             'iduser' => $user->getiduser(),
             'idstatus' => OrderStatus::EM_ABERTO,
-            'vltotal' => $cart->getvltotal()
+            'vltotal' => $cart->getvltotal(),
         ]);
 
         $order->save();
-        // header("Location: /order/" . $order->getidorder());
-        header("Location: /order/" . $order->getidorder()."/pagseguro");
+
+        switch ((int) $_POST['payment-method']) {
+            case 1:
+                header("Location:/order/" . $order->getidorder() . "/pagseguro");
+                break;
+            case 2:
+                header("Location:/order/" . $order->getidorder() . "/paypal");
+                break;
+            default://Boleto Bancário Normal
+                header("Location: /order/" . $order->getidorder());
+        }
         exit;
     });
 
-    $app->get("/order/:idorder/pagseguro",function($idorder){
+
+    
+    $app->get("/order/:idorder/paypal", function ($idorder) {
 
         $order = new Order();
-        
-        $order->get((int)$idorder);
+
+        $order->get((int) $idorder);
 
         $cart = $order->getCart();
 
+        $vlFreightPerItem = $cart->getvlfreight() / count($cart->getProducts());
+
         $page = new Page([
-            'header'=>false,
-            'footer'=>false
+            'header' => false,
+            'footer' => false
         ]);
 
-        $page->setTpl("payment-pagseguro",[
-            'order'=>$order->getValues(),
-            'cart'=>$cart->getValues(),
-            'products'=>$cart->getProducts(),
-            'phone'=>[
-                'areaCode'=>substr($order->getnrphone(),0,2),
-                'number'=>substr($order->getnrphone(),2,strlen($order->getnrphone()))
-            ]
+        $page->setTpl("payment-paypal", [
+            'order' => $order->getValues(),
+            'cart' => $cart->getValues(),
+            'products' => $cart->getProducts(),
+            'vlFreightPerItem' => $vlFreightPerItem           
+        ]);
+    });
+
+    $app->get("/order/:idorder/pagseguro", function ($idorder) {
+
+        $order = new Order();
+
+        $order->get((int) $idorder);
+
+        $cart = $order->getCart();
+
+        $vlFreightPerItem = $cart->getvlfreight() / count($cart->getProducts());
+// echo  $vlFreightPerItem ; exit;
+
+        $page = new Page([
+            'header' => false,
+            'footer' => false
+        ]);
+
+        $page->setTpl("payment-pagseguro", [
+            'order' => $order->getValues(),
+            'cart' => $cart->getValues(),
+            'products' => $cart->getProducts(),
+            'phone' => [
+                'areaCode' => substr($order->getnrphone(), 0, 2),
+                'number' => substr($order->getnrphone(), 2, strlen($order->getnrphone()))
+            ],
+            'vlFreightPerItem' => $vlFreightPerItem
         ]);
     });
 
@@ -534,7 +578,7 @@
     });
 
     $app->post("/profile/change-password", function () {
-      
+
         User::verifyLogin(false);
 
         if (!isset($_POST['current_pass']) || $_POST['current_pass'] === '') {
@@ -562,7 +606,7 @@
         }
 
         $user = User::getFromSession();
-     
+
         if (!password_verify($_POST['current_pass'], $user->getdespassword())) {
             User::setError("A senha está inválida.");
             header("Location: /profile/change-password");
