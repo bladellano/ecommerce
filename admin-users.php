@@ -112,12 +112,11 @@ $app->get("/admin/users/:iduser", function ($iduser) {
     $user = new User();
 
     $user->get((int) $iduser);
-
     $page = new PageAdmin();
 
-    $page->setTpl("users-update", array(
+    $page->setTpl("users-update", [
         "user" => $user->getValues(),
-    ));
+    ]);
 
 });
 

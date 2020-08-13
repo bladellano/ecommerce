@@ -82,6 +82,9 @@ class User extends Model
         }
     }
 
+     /**
+      * Verifica se o usuário está logado e se é administrador ou não.
+      */
     public static function verifyLogin($inadmin = true)
     {
 
@@ -110,7 +113,6 @@ class User extends Model
 
     public function save()
     {
-
         $sql = new Sql();
 
         $results = $sql->select(
