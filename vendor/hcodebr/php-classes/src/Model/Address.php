@@ -48,12 +48,12 @@ class Address extends Model
         $results = $sql->select("CALL sp_addresses_save(:idaddress, :idperson, :desaddress, :desnumber, :descomplement, :descity, :desstate, :descountry, :deszipcode, :desdistrict)", [
 			':idaddress'=>$this->getidaddress(),
 			':idperson'=>(int)$this->getidperson(),
-			':desaddress'=>utf8_decode($this->getdesaddress()),
+			':desaddress'=>($this->getdesaddress()),
 			':desnumber'=>$this->getdesnumber(),
-			':descomplement'=>utf8_decode($this->getdescomplement()),
+			':descomplement'=>($this->getdescomplement()),
 			':descity'=>($this->getdescity()),
-			':desstate'=>utf8_decode($this->getdesstate()),
-			':descountry'=>utf8_decode($this->getdescountry()),
+			':desstate'=>($this->getdesstate()),
+			':descountry'=>($this->getdescountry()),
 			':deszipcode'=>$this->getdeszipcode(),
 			':desdistrict'=>$this->getdesdistrict()
 		]);
