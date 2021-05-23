@@ -4,6 +4,6 @@ Projeto desenvolvido do zero no [Curso de PHP 7](https://www.udemy.com/curso-com
 
 Template usado no projeto [Almsaeed Studio](https://almsaeedstudio.com)
 
-#Primeiramente
-`$ composer install`
-`Criar a pasta views-cache com permissão 777`
+# Instalação
+a) $ composer install
+b) cCriar a pasta views-cache com permissão 777
