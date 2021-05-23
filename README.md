@@ -6,4 +6,4 @@ Template usado no projeto [Almsaeed Studio](https://almsaeedstudio.com)
 
 # Instalação
 a) $ composer install
-b) cCriar a pasta views-cache com permissão 777
+b) Criar a pasta views-cache com permissão 777
