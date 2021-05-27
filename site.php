@@ -17,6 +17,12 @@
         ]);
     });
 
+    $app->get('/about', function () {
+        $page = new Page();
+        $page->setTpl("about");
+    });
+
+
     $app->get("/categories/:idcategory", function ($idcategory) {
         $page = (isset($_GET['page'])) ? (int) $_GET['page'] : 1;
         $category = new Category();
@@ -222,14 +228,14 @@
             case 2:
                 header("Location:/order/" . $order->getidorder() . "/paypal");
                 break;
-            default://Boleto Bancário Normal
+            default: //Boleto Bancário Normal
                 header("Location: /order/" . $order->getidorder());
         }
         exit;
     });
 
 
-    
+
     $app->get("/order/:idorder/paypal", function ($idorder) {
 
         $order = new Order();
@@ -249,7 +255,7 @@
             'order' => $order->getValues(),
             'cart' => $cart->getValues(),
             'products' => $cart->getProducts(),
-            'vlFreightPerItem' => $vlFreightPerItem           
+            'vlFreightPerItem' => $vlFreightPerItem
         ]);
     });
 
@@ -262,7 +268,6 @@
         $cart = $order->getCart();
 
         $vlFreightPerItem = $cart->getvlfreight() / count($cart->getProducts());
-// echo  $vlFreightPerItem ; exit;
 
         $page = new Page([
             'header' => false,
@@ -363,14 +368,35 @@
     });
 
     $app->post("/forgot", function () {
-        $user = User::getForgot($_POST["email"], false); //false para url de recuperação de usuário.
-        header("Location:/forgot/sent");
-        exit;
+
+        try {
+            $user = User::getForgot($_POST["email"], false); //false para url de recuperação de usuário.
+
+            User::setSuccess('<h4 class="alert-heading">E-mail enviado!</h4>
+            <p>Verifique seu e-mail e siga as instruções para recuperar a sua senha.</p>');
+            header("Location:/forgot/sent");
+            exit;
+        } catch (\Exception $e) {
+            User::setError('<h4 class="alert-heading">E-mail não enviado!</h4>
+            <p>' . $e->getMessage() . '</p>');
+            header("Location:/forgot/sent");
+            exit;
+        }
     });
 
     $app->get("/forgot/sent", function () {
         $page = new Page();
-        $page->setTpl("forgot-sent");
+        $page->setTpl("forgot-sent", [
+            'UserError' => User::getError(),
+            'UserMsg' => User::getSuccess()
+        ]);
+    });
+
+    $app->get("/forgot/sent-failed", function () {
+        $page = new Page();
+        $page->setTpl("forgot-sent-failed", [
+            'UserError' => User::getError()
+        ]);
     });
 
     $app->get("/forgot/reset", function () {

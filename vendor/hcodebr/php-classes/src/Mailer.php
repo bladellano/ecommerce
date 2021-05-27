@@ -5,12 +5,11 @@ namespace Hcode;
 use PHPMailer;
 use Rain\Tpl;
 
-
 class Mailer{
 
-    const USERNAME = 'dellanosites@gmail.com';
-    const PASSWORD = '@@Caio2019';
-    const NAME_FROM = 'Hcode Store';
+    const USERNAME = MAIL_EMAIL;
+    const PASSWORD = MAIL_PASSWORD;
+    const NAME_FROM = MAIL_NAME_FROM;
     
     private $mail;
 
@@ -30,9 +29,7 @@ class Mailer{
           $tpl->assign($key, $value);
       }
       
-      $html = $tpl->draw($tplName,true);//TRUE joga para dentro da variação, não imprime na tela.
-
-      //-------------------------//
+      $html = $tpl->draw($tplName,true); //TRUE: joga para dentro da variável, não imprime na tela.
      
       $this->mail = new PHPMailer;
       
@@ -48,7 +45,7 @@ class Mailer{
 
       $this->mail->Password = Mailer::PASSWORD;
 
-      $this->mail->setFrom(Mailer::USERNAME,Mailer::NAME_FROM);
+      $this->mail->setFrom(Mailer::USERNAME,utf8_decode( Mailer::NAME_FROM));
       $this->mail->addAddress($toAdress,$toName);
       $this->mail->Subject = $subject;
       $this->mail->msgHTML($html);
@@ -61,6 +58,3 @@ class Mailer{
     }
 
 }
-
-
-?>

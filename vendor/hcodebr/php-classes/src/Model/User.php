@@ -186,7 +186,7 @@ class User extends Model
         tb_users b USING (idperson)
         WHERE
         a.desemail = :email", array(":email" => $email));
-
+        
         if (count($results) === 0) {
             throw new \Exception("Não foi possível recuperar a senha.");
         } else {
@@ -211,12 +211,12 @@ class User extends Model
                 $code = base64_encode($code);
 
                 if ($inadmin === true) {
-                    $link = "http://www.hcodecommerce.com.br/admin/forgot/reset?code=$code";
+                    $link = URL_BASE."/admin/forgot/reset?code=$code";
                 } else {
-                    $link = "http://www.hcodecommerce.com.br/forgot/reset?code=$code";
+                    $link = URL_BASE."/forgot/reset?code=$code";
                 }
 
-                $mailer = new Mailer($data["desemail"], $data["desperson"], "Redefinir senha da Hcode Store", "forgot", array(
+                $mailer = new Mailer($data["desemail"], $data["desperson"], "Redefinir senha - ". utf8_decode( MAIL_NAME_FROM ), "forgot", array(
                     "name" => $data["desperson"],
                     "link" => $link,
                 ));
