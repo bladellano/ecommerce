@@ -1,6 +1,6 @@
 <?php
 
-define("URL_BASE","http://hcodecommerce.com.br");
+define("URL_BASE","http://psmagnetica.com.br");
 
 // Email configuration
 define("MAIL_EMAIL","dellanosites@gmail.com");
@@ -19,7 +19,7 @@ define("URL_SITE", URL_BASE);
 define("IMAGE", URL_BASE."/views/site/assets/images/logo.jpg");
 
 // Database configuration
-define("DB_SITE", [
+define("DATA_LAYER_CONFIG", [
     "driver" => "mysql",
     "host" => "127.0.0.1",
     "port" => "3306",

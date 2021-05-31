@@ -3,7 +3,6 @@
 use Hcode\PageAdmin;
 use Hcode\Model\User;
 
-
 $app->get('/admin', function () {
 
     User::verifyLogin();
@@ -12,20 +11,26 @@ $app->get('/admin', function () {
     $page->setTpl("index");
 });
 
-//Login
-
 $app->get('/admin/login', function () {
     $page = new PageAdmin([
         "header" => false,
         "footer" => false,
     ]);
-    $page->setTpl("login");
+    $page->setTpl("login", [
+        'UserError' => User::getError(),
+        'UserMsg' => User::getSuccess()
+    ]);
 });
 
 $app->post('/admin/login', function () {
 
-    User::login($_POST["login"], $_POST["password"]);
-    header("Location: /admin");
+    try {
+        User::login($_POST["login"], $_POST["password"]);
+        header("Location: /admin");
+    } catch (\Exception $e) {
+        User::setError($e->getMessage());
+        header("Location: /admin/login");
+    }
     exit;
 });
 
@@ -44,7 +49,6 @@ $app->get("/admin/forgot", function () {
     ]);
 
     $page->setTpl("forgot");
-
 });
 
 $app->post("/admin/forgot", function () {
@@ -54,7 +58,6 @@ $app->post("/admin/forgot", function () {
     header("Location:/admin/forgot/sent");
 
     exit;
-
 });
 
 $app->get("/admin/forgot/sent", function () {
@@ -65,23 +68,27 @@ $app->get("/admin/forgot/sent", function () {
     ]);
 
     $page->setTpl("forgot-sent");
-
 });
 
 $app->get("/admin/forgot/reset", function () {
-
-    $user = User::validForgotDecrypt($_GET['code']);
 
     $page = new PageAdmin([
         "header" => false,
         "footer" => false,
     ]);
 
-    $page->setTpl("forgot-reset", array(
-        "name" => $user["desperson"],
-        "code" => $_GET["code"],
-    ));
+    try {
 
+        $user = User::validForgotDecrypt($_GET['code']);
+        $page->setTpl("forgot-reset", array(
+            "name" => $user["desperson"],
+            "code" => $_GET["code"],
+        ));
+    } catch (\Exception $e) {
+        //Redireciona para /admin por ter token inválido.
+        header("Location:/admin");
+        exit;
+    }
 });
 
 $app->post("/admin/forgot/reset", function () {
@@ -106,5 +113,4 @@ $app->post("/admin/forgot/reset", function () {
     ]);
 
     $page->setTpl("forgot-reset-success");
-
 });

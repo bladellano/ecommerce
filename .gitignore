@@ -1,2 +1,4 @@
 views-cache/
+storaged/
+vendor/
 .vscode/

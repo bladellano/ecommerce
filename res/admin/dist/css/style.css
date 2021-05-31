@@ -1,0 +1,41 @@
+/* Custom Css */
+:root {
+  --blue-background: #afd6ff;
+}
+
+.lockscreen {
+  background-color: var(--blue-background);
+}
+.login-page,
+.register-page {
+  background-color: var(--blue-background);
+}
+
+/* Lista as imagens do produto */
+.list--images--products {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+}
+.list--images--products li {
+  margin: 2px;
+  position: relative;
+}
+.list--images--products li a {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+.list--images--products li img {
+  object-fit: cover;
+  width: 180px;
+  height: 180px;
+}
+
+/* Box de mensagem padrão */
+
+.box--message {
+  padding: 2px 10px;
+}
