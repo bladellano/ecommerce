@@ -88,7 +88,7 @@ body {
 
 .mainmenu-area {
   background: none repeat scroll 0 0 #fbfbfb;
-  font-family: "Roboto Condensed", sans-serif;
+  font-family: "Roboto", sans-serif;
   text-transform: uppercase;
   width: 100%;
   z-index: 999;
@@ -372,14 +372,14 @@ body {
   border-top: 1px solid #e5e5e5;
   border-bottom: 1px solid #e5e5e5;
   color: #fff;
-  padding: 20px 0 20px;
+  padding:0 200px ;
 }
 
 .promo-area .zigzag-bottom,
 .brands-area .zigzag-bottom {
   background: #f4f4f4;
 }
-.single-promo {
+.single-promo {/* FOCO */
   font-size: 25px;
   font-weight: 200;
   padding: 20px 10px;
@@ -394,23 +394,33 @@ body {
   background: #222;
 }
 .promo1 {
-  background: var(--cor-primary);
+  background: #069;
 }
 .promo2 {
-  background: #ffd900;
+  background: #069069;
 }
 .promo3 {
-  background: #fa8072;
+  background: #069fff;
 }
 .promo4 {
-  background: #4abebd;
+  background: #069000;
 }
 .section-title {
-  font-family: "Raleway", sans-serif;
-  font-size: 50px;
-  font-weight: 100;
-  margin-bottom: 50px;
+  font-family: "Roboto Condensed";
+  text-transform: uppercase;
+  letter-spacing: -1px;
+  font-size: 30px;
+  font-weight: 500;
+  margin-bottom: 15px;
+  margin-top: 25px;
   text-align: center;
+  color: #333;
+}
+
+.section-title + hr {
+  border: 2px solid var(--cor-primary);
+  width: 200px;
+  margin: 0 auto;
 }
 
 .product-f-image {
@@ -438,7 +448,6 @@ body {
 }
 .product-hover a {
   background: none repeat scroll 0 0 var(--cor-primary);
-  border-radius: 5px;
   color: #fff;
   display: block;
   font-size: 16px;
@@ -459,10 +468,9 @@ body {
   border-color: #444;
 }
 .product-carousel-price ins {
-  color: var(--cor-primary);
   font-weight: 700;
-  margin-right: 5px;
   text-decoration: none;
+  color: var(--cor-primary);
 }
 .product-hover a i.fa {
   margin-right: 5px;
@@ -490,8 +498,12 @@ body {
 
 .single-product {
   overflow: hidden;
+  text-align: center;
 }
-.single-product:hover {
+.single-product h2 a{
+  color: #555;
+  font-size: 14px;
+  text-transform: uppercase;
 }
 .single-product:hover .product-hover a.add-to-cart-link {
   top: 32%;
@@ -514,7 +526,7 @@ body {
 
 .latest-product .owl-nav div,
 .related-products-wrapper .owl-nav div {
-  background: #fa8072;
+  background: var(--cor-primary);
   color: #fff;
   display: inline-block;
   margin-left: 15px;
@@ -524,15 +536,7 @@ body {
 .brand-wrapper .owl-nav div:hover,
 .related-products-wrapper .owl-nav div:hover {
   color: #fff;
-  background: #f95f5f;
-}
-.brand-list {
-  padding-top: 40px;
-}
-.brand-list .owl-nav {
-  position: absolute;
-  right: 0;
-  top: 0;
+  background: var(--cor-primary);
 }
 .brand-wrapper .owl-nav div {
   border: 1px solid #fff;
@@ -542,12 +546,28 @@ body {
   padding: 1px 10px;
 }
 
-.brand-wrapper .owl-nav div {
-  background: #fa8072;
-  color: #fff;
+.brand-wrapper .owl-nav div:first-child::before,
+.product-carousel .owl-nav div:first-child::before {
+  font-family: "FontAwesome";
+  content: "\f104";
+}
+
+.product-carousel .owl-nav div:last-child::before,
+.brand-wrapper .owl-nav div:last-child::before {
+  content: "\f105";
+  font-family: "FontAwesome";
+}
+
+.brand-wrapper .owl-nav div,
+.product-carousel .owl-nav div {
+  background: #e4e4e4;
+  color: #333;
   display: inline-block;
   margin-left: 15px;
-  padding: 1px 10px;
+  padding: 6px 14px;
+  border-radius: 50%;
+  height: 33px;
+  width: 33px;
 }
 
 .maincontent-area {
@@ -620,7 +640,7 @@ body {
   background: #f4f4f4;
 }
 .footer-top-area {
-  background: none repeat scroll 0 0 #333;
+  background: none repeat scroll 0 0 var(--cor-primary);
   color: #999;
   padding: 35px 0 180px;
 }
@@ -706,10 +726,12 @@ body {
 }
 a {
   color: var(--cor-primary);
+  transition: all .3s;
 }
 a:hover,
 a:focus {
-  color: #17a78b;
+  color: var(--cor-primary);
+  text-decoration: none;
 }
 .footer-bottom-area {
   background: none repeat scroll 0 0 #000;
@@ -1191,7 +1213,8 @@ table.shop_table td.product-remove a {
 
 table.shop_table td.product-remove a:hover {
   color: #fff;
-  background: red;
+  background: #ccc; /*FOCO*/
+  border-radius: 50%;
   text-decoration: none;
 }
 table.shop_table td.product-name a {
